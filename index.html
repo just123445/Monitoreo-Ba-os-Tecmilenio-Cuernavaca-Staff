@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplicación Teléfono - Staff de Limpieza</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        /* Custom scrollbar for mobile frame */
+        .custom-scroll::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scroll::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="bg-slate-200 text-slate-800 font-sans min-h-screen p-4 md:p-6 flex flex-col items-center justify-center">
+
+    <!-- CONTENEDOR MÓVIL (MARCO DE TELÉFONO) -->
+    <div class="w-full max-w-[390px] h-[812px] bg-slate-900 rounded-[50px] p-4 shadow-2xl border-4 border-slate-700 flex flex-col relative overflow-hidden ring-1 ring-slate-900/50">
+        
+        <!-- Notch Superior del Teléfono -->
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-36 h-6 bg-slate-900 rounded-b-2xl z-50 flex justify-center items-center">
+            <div class="w-12 h-1 bg-slate-800 rounded-full"></div>
+            <div class="w-3 h-3 bg-slate-950 rounded-full ml-3 border border-slate-800"></div>
+        </div>
+
+        <!-- PANTALLA INTERIOR DEL CELULAR -->
+        <div class="bg-slate-50 rounded-[38px] flex-1 flex flex-col overflow-hidden relative text-slate-800 pt-6">
+            
+            <!-- Barra Superior de Estado / Header -->
+            <header class="bg-white px-4 py-3 border-b border-slate-200 flex items-center justify-between shadow-sm shrink-0">
+                <div class="flex items-center space-x-2.5">
+                    <div class="w-9 h-9 rounded-2xl bg-blue-600 text-white flex items-center justify-center font-black text-sm shadow-md shadow-blue-500/20">
+                        <i class="fa-solid fa-broom"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xs font-black text-slate-900 tracking-tight uppercase">Staff Limpieza</h1>
+                        <p class="text-[10px] text-slate-500 font-bold flex items-center gap-1">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                            <span>Sincronizado</span>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex items-center space-x-1.5">
+                    <span id="badge-pending-count" class="bg-rose-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full shadow-sm hidden">
+                        0 nuevos
+                    </span>
+                </div>
+            </header>
+
+            <!-- PESTAÑAS PRINCIPALES -->
+            <nav class="flex bg-white border-b border-slate-200 text-xs font-extrabold text-slate-400 shrink-0">
+                <button id="tab-btn-status" onclick="switchTab('status')" class="flex-1 py-3 text-blue-600 border-b-2 border-blue-600 flex items-center justify-center space-x-1.5 transition">
+                    <i class="fa-solid fa-sliders"></i>
+                    <span>Estado Baños</span>
+                </button>
+                <button id="tab-btn-reports" onclick="switchTab('reports')" class="flex-1 py-3 hover:text-slate-600 flex items-center justify-center space-x-1.5 relative transition">
+                    <i class="fa-solid fa-bell"></i>
+                    <span>Reportes</span>
+                    <span id="dot-reports-badge" class="w-2 h-2 rounded-full bg-rose-500 hidden absolute top-2.5 right-6"></span>
+                </button>
+            </nav>
+
+            <!-- ÁREA DE CONTENIDO PRINCIPAL SCROLLABLE -->
+            <main class="flex-1 overflow-y-auto p-4 space-y-4 custom-scroll" id="phone-main-content">
+                
+                <!-- SECCIÓN 1: CONTROL DE ESTADO DE BAÑOS -->
+                <div id="section-status" class="space-y-4">
+                    
+                    <!-- Selector de Piso -->
+                    <div class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm space-y-2">
+                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block">Seleccionar Piso:</span>
+                        <div class="grid grid-cols-4 gap-1.5">
+                            <button onclick="selectFloor(1)" id="fbtn-1" class="f-btn py-2 text-xs font-black rounded-xl border border-blue-600 bg-blue-50 text-blue-600 transition">Piso 1</button>
+                            <button onclick="selectFloor(2)" id="fbtn-2" class="f-btn py-2 text-xs font-black rounded-xl border border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 transition">Piso 2</button>
+                            <button onclick="selectFloor(3)" id="fbtn-3" class="f-btn py-2 text-xs font-black rounded-xl border border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 transition">Piso 3</button>
+                            <button onclick="selectFloor(4)" id="fbtn-4" class="f-btn py-2 text-xs font-black rounded-xl border border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 transition">Piso 4</button>
+                        </div>
+                    </div>
+
+                    <!-- Lista de Baños del Piso Seleccionado -->
+                    <div class="space-y-3">
+                        
+                        <!-- Baño Mujeres -->
+                        <div class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm space-y-2.5">
+                            <div class="flex justify-between items-center">
+                                <div class="flex items-center space-x-2">
+                                    <i class="fa-solid fa-person-dress text-base text-blue-600"></i>
+                                    <span class="text-xs font-black text-slate-800">Baño de Mujeres</span>
+                                </div>
+                                <span id="badge-status-m" class="text-[10px] font-black px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 border border-emerald-200">
+                                    Disponible
+                                </span>
+                            </div>
+                            <div class="grid grid-cols-3 gap-1.5 pt-1">
+                                <button onclick="setBathroomStatus('m', 'emerald')" class="py-2 text-[10px] font-black rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 active:scale-95 transition">
+                                    Disponible
+                                </button>
+                                <button onclick="setBathroomStatus('m', 'amber')" class="py-2 text-[10px] font-black rounded-xl bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100 active:scale-95 transition">
+                                    En Limpieza
+                                </button>
+                                <button onclick="setBathroomStatus('m', 'rose')" class="py-2 text-[10px] font-black rounded-xl bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100 active:scale-95 transition">
+                                    Mantenimiento
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Baño Hombres -->
+                        <div class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm space-y-2.5">
+                            <div class="flex justify-between items-center">
+                                <div class="flex items-center space-x-2">
+                                    <i class="fa-solid fa-person text-base text-blue-600"></i>
+                                    <span class="text-xs font-black text-slate-800">Baño de Hombres</span>
+                                </div>
+                                <span id="badge-status-h" class="text-[10px] font-black px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 border border-emerald-200">
+                                    Disponible
+                                </span>
+                            </div>
+                            <div class="grid grid-cols-3 gap-1.5 pt-1">
+                                <button onclick="setBathroomStatus('h', 'emerald')" class="py-2 text-[10px] font-black rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 active:scale-95 transition">
+                                    Disponible
+                                </button>
+                                <button onclick="setBathroomStatus('h', 'amber')" class="py-2 text-[10px] font-black rounded-xl bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100 active:scale-95 transition">
+                                    En Limpieza
+                                </button>
+                                <button onclick="setBathroomStatus('h', 'rose')" class="py-2 text-[10px] font-black rounded-xl bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100 active:scale-95 transition">
+                                    Mantenimiento
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Baño Universal -->
+                        <div class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm space-y-2.5">
+                            <div class="flex justify-between items-center">
+                                <div class="flex items-center space-x-2">
+                                    <i class="fa-solid fa-wheelchair text-base text-blue-600"></i>
+                                    <span class="text-xs font-black text-slate-800">Baño Universal</span>
+                                </div>
+                                <span id="badge-status-u" class="text-[10px] font-black px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 border border-emerald-200">
+                                    Disponible
+                                </span>
+                            </div>
+                            <div class="grid grid-cols-3 gap-1.5 pt-1">
+                                <button onclick="setBathroomStatus('u', 'emerald')" class="py-2 text-[10px] font-black rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 active:scale-95 transition">
+                                    Disponible
+                                </button>
+                                <button onclick="setBathroomStatus('u', 'amber')" class="py-2 text-[10px] font-black rounded-xl bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100 active:scale-95 transition">
+                                    En Limpieza
+                                </button>
+                                <button onclick="setBathroomStatus('u', 'rose')" class="py-2 text-[10px] font-black rounded-xl bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100 active:scale-95 transition">
+                                    Mantenimiento
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- SECCIÓN 2: LISTA DE REPORTES RECIBIDOS -->
+                <div id="section-reports" class="space-y-3 hidden">
+                    <div id="reports-list-container" class="space-y-3">
+                        <!-- Se puebla dinámicamente -->
+                    </div>
+                </div>
+
+            </main>
+
+            <!-- Barra Inferior de Navegación del Teléfono -->
+            <footer class="bg-white border-t border-slate-200 p-2 text-center text-[10px] font-bold text-slate-400 shrink-0">
+                Red Escolar • Sincronización Automática
+            </footer>
+
+        </div>
+
+    </div>
+
+    <script>
+        const DEFAULT_STATUS = {
+            '1-m': 'emerald', '1-h': 'emerald', '1-u': 'emerald',
+            '2-m': 'emerald', '2-h': 'emerald', '2-u': 'emerald',
+            '3-m': 'emerald', '3-h': 'emerald', '3-u': 'emerald',
+            '4-m': 'emerald', '4-h': 'emerald', '4-u': 'emerald'
+        };
+
+        let currentFloor = 1;
+
+        let appData = {
+            bathrooms: JSON.parse(localStorage.getItem('bathrooms_status')) || DEFAULT_STATUS,
+            reports: JSON.parse(localStorage.getItem('bathrooms_reports')) || []
+        };
+
+        const channel = new BroadcastChannel('school_bathrooms_channel');
+
+        window.onload = function() {
+            renderPhoneView();
+
+            channel.onmessage = (event) => {
+                if (event.data && event.data.type === 'SYNC') {
+                    appData = event.data.payload;
+                    renderPhoneView();
+                }
+            };
+        };
+
+        function saveData() {
+            localStorage.setItem('bathrooms_status', JSON.stringify(appData.bathrooms));
+            localStorage.setItem('bathrooms_reports', JSON.stringify(appData.reports));
+            channel.postMessage({ type: 'SYNC', payload: appData });
+            renderPhoneView();
+        }
+
+        function switchTab(tab) {
+            const secStatus = document.getElementById('section-status');
+            const secReports = document.getElementById('section-reports');
+            const btnStatus = document.getElementById('tab-btn-status');
+            const btnReports = document.getElementById('tab-btn-reports');
+
+            if (tab === 'status') {
+                secStatus.classList.remove('hidden');
+                secReports.classList.add('hidden');
+                btnStatus.className = "flex-1 py-3 text-blue-600 border-b-2 border-blue-600 flex items-center justify-center space-x-1.5 transition";
+                btnReports.className = "flex-1 py-3 hover:text-slate-600 flex items-center justify-center space-x-1.5 relative transition";
+            } else {
+                secStatus.classList.add('hidden');
+                secReports.classList.remove('hidden');
+                btnStatus.className = "flex-1 py-3 hover:text-slate-600 flex items-center justify-center space-x-1.5 transition";
+                btnReports.className = "flex-1 py-3 text-blue-600 border-b-2 border-blue-600 flex items-center justify-center space-x-1.5 relative transition";
+                document.getElementById('dot-reports-badge').classList.add('hidden');
+            }
+        }
+
+        function selectFloor(floor) {
+            currentFloor = floor;
+            document.querySelectorAll('.f-btn').forEach(b => {
+                b.className = "f-btn py-2 text-xs font-black rounded-xl border border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 transition";
+            });
+            document.getElementById(`fbtn-${floor}`).className = "f-btn py-2 text-xs font-black rounded-xl border border-blue-600 bg-blue-50 text-blue-600 transition";
+            renderPhoneView();
+        }
+
+        function setBathroomStatus(type, status) {
+            appData.bathrooms[`${currentFloor}-${type}`] = status;
+            saveData();
+        }
+
+        function renderPhoneView() {
+            // Actualizar Badges según piso seleccionado
+            ['m', 'h', 'u'].forEach(type => {
+                const status = appData.bathrooms[`${currentFloor}-${type}`] || 'emerald';
+                const badge = document.getElementById(`badge-status-${type}`);
+                if (badge) {
+                    if (status === 'emerald') {
+                        badge.className = "text-[10px] font-black px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 border border-emerald-200";
+                        badge.innerText = "Disponible";
+                    } else if (status === 'amber') {
+                        badge.className = "text-[10px] font-black px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-700 border border-amber-200";
+                        badge.innerText = "En Limpieza";
+                    } else if (status === 'rose') {
+                        badge.className = "text-[10px] font-black px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-700 border border-rose-200";
+                        badge.innerText = "Mantenimiento";
+                    }
+                }
+            });
+
+            // Actualizar Reportes
+            const pendingReports = appData.reports.filter(r => r.status === 'pending');
+            const pendingBadge = document.getElementById('badge-pending-count');
+            const dotBadge = document.getElementById('dot-reports-badge');
+
+            if (pendingReports.length > 0) {
+                pendingBadge.innerText = `${pendingReports.length} nuevo(s)`;
+                pendingBadge.classList.remove('hidden');
+                dotBadge.classList.remove('hidden');
+            } else {
+                pendingBadge.classList.add('hidden');
+                dotBadge.classList.add('hidden');
+            }
+
+            const container = document.getElementById('reports-list-container');
+            if (appData.reports.length === 0) {
+                container.innerHTML = `
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 text-center space-y-2 my-4">
+                        <i class="fa-solid fa-clipboard-check text-slate-300 text-4xl"></i>
+                        <p class="text-xs font-bold text-slate-500">Sin reportes registrados</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = appData.reports.map(r => `
+                <div class="bg-white p-3.5 rounded-2xl border ${r.status === 'pending' ? 'border-rose-200 bg-rose-50/20' : 'border-slate-200 opacity-60'} shadow-sm space-y-2">
+                    <div class="flex justify-between items-start">
+                        <span class="text-[10px] font-black text-rose-600 bg-rose-100 border border-rose-200 px-2 py-0.5 rounded-lg">
+                            Piso ${r.floor} • ${r.typeName}
+                        </span>
+                        <span class="text-[10px] font-mono font-bold text-slate-400">${r.timestamp}</span>
+                    </div>
+
+                    <div class="text-xs font-black text-slate-800 flex items-center gap-1.5">
+                        <i class="fa-solid fa-screwdriver-wrench text-rose-500"></i>
+                        <span>${r.fixture}</span>
+                    </div>
+
+                    <p class="text-xs text-slate-600 bg-slate-50 p-2 rounded-xl border border-slate-100 font-medium">${r.description}</p>
+
+                    <div class="pt-2 border-t border-slate-100 flex justify-between items-center text-[10px]">
+                        <span class="font-bold text-slate-500">Matrícula: <strong class="text-slate-900 font-mono">${r.studentId}</strong></span>
+                        ${r.status === 'pending' ? `
+                            <div class="flex space-x-1">
+                                <button onclick="resolveReport(${r.id})" class="bg-emerald-600 hover:bg-emerald-700 text-white font-black px-2.5 py-1 rounded-lg transition">
+                                    Atendido
+                                </button>
+                                <button onclick="markFakeReport(${r.id})" class="bg-slate-800 hover:bg-slate-900 text-white font-black px-2.5 py-1 rounded-lg transition">
+                                    Marcar Falso
+                                </button>
+                            </div>
+                        ` : `
+                            <span class="font-extrabold uppercase ${r.status === 'resolved' ? 'text-emerald-600' : 'text-slate-400'}">
+                                ${r.status === 'resolved' ? 'Atendido' : 'Reporte Falso'}
+                            </span>
+                        `}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function resolveReport(id) {
+            const report = appData.reports.find(r => r.id === id);
+            if (report) {
+                report.status = 'resolved';
+                saveData();
+            }
+        }
+
+        function markFakeReport(id) {
+            const report = appData.reports.find(r => r.id === id);
+            if (report) {
+                report.status = 'fake';
+                alert(`Reporte asignado como FALSO. La matrícula ${report.studentId} ha sido registrada para canalización disciplinaria.`);
+                saveData();
+            }
+        }
+    </script>
+</body>
+</html>
